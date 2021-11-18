@@ -139,7 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\PL\PL5\PL5\RgbImage.cpp" />
     <ClCompile Include="CG_Project.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\PL\PL5\PL5\RgbImage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\madeira_preta.bmp" />
+    <Image Include="red_rubber.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

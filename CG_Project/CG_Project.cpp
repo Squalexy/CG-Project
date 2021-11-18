@@ -11,6 +11,7 @@ Nº2019192123
 #include <stdio.h>
 #include <math.h>
 #include <GL\glut.h>
+#include "RgbImage.h"
 
 
 /* --------------------------------------- DEFINES --------------------------------------- */
@@ -37,6 +38,9 @@ Nº2019192123
 float		centrox, centrox_botao1, centrox_botao2, centrox_joystick = 0;
 float rotacao, rotacao_botao1, rotacao_joystick_x, rotacao_joystick_z = 0;
 GLfloat										 altura, altura_joystick  = 0;
+
+GLuint   textures[3];
+RgbImage imag;
 
 // --- animações --- //
 
@@ -128,112 +132,58 @@ static GLfloat vertices_maquina[] = {
 	 tam_maquina, tam_maquina*0.8, tam_maquina, // 49
 	 tam_maquina, tam_maquina*0.8,-tam_maquina, // 50
 	 tam_maquina,    0,			  -tam_maquina, // 51
-
-	 // ----- joystick ----- //
-
-	// esquerda base
-	-tam_maquina,  -tam_maquina,  tam_maquina,	// 52
-	-tam_maquina,   tam_maquina,  tam_maquina,	// 53
-	-tam_maquina,   tam_maquina, -tam_maquina,	// 54
-	-tam_maquina,  -tam_maquina, -tam_maquina,	// 55
-	 // direita base
-	 tam_maquina,   -tam_maquina,  tam_maquina, // 56
-	 tam_maquina,    tam_maquina,  tam_maquina, // 57
-	 tam_maquina,    tam_maquina, -tam_maquina, // 58
-	 tam_maquina,   -tam_maquina, -tam_maquina, // 59
-	 // atras base
-	 -tam_maquina,  -tam_maquina, -tam_maquina, // 60
-	 -tam_maquina,   tam_maquina, -tam_maquina, // 61
-	 tam_maquina,    tam_maquina, -tam_maquina, // 62
-	 tam_maquina,   -tam_maquina, -tam_maquina, // 63
-	 // frente base
-	 -tam_maquina,  -tam_maquina,  tam_maquina, // 64
-	 tam_maquina,   -tam_maquina,  tam_maquina, // 65
-	 tam_maquina,    tam_maquina,  tam_maquina, // 66
-	 -tam_maquina,   tam_maquina,  tam_maquina  // 67
-
-	 // esquerda botao
-	-tam_maquina,  -tam_maquina,   tam_maquina,	// 68
-	-tam_maquina,   tam_maquina,   tam_maquina,	// 69
-	-tam_maquina,   tam_maquina,  -tam_maquina,	// 70
-	-tam_maquina,  -tam_maquina,  -tam_maquina,	// 71
-	 // direita botao
-	 tam_maquina,  -tam_maquina,  tam_maquina,	// 72
-	 tam_maquina,   tam_maquina,  tam_maquina,	// 73
-	 tam_maquina,   tam_maquina, -tam_maquina,	// 74
-	 tam_maquina,  -tam_maquina, -tam_maquina,	// 75
-	 // atras botao
-	-tam_maquina,  -tam_maquina,  -tam_maquina,	// 76
-	-tam_maquina,   tam_maquina,  -tam_maquina,	// 77
-	 tam_maquina,   tam_maquina,  -tam_maquina,	// 78
-	 tam_maquina,  -tam_maquina,  -tam_maquina,	// 79
-	 // frente botao
-	-tam_maquina,  -tam_maquina,   tam_maquina,	// 80
-	 tam_maquina,  -tam_maquina,   tam_maquina,	// 81
-	 tam_maquina,   tam_maquina,   tam_maquina,	// 82
-	-tam_maquina,   tam_maquina,   tam_maquina	// 83
-	 // cima botao
-	-tam_maquina,   tam_maquina,   tam_maquina,	// 84 
-	-tam_maquina,   tam_maquina,  -tam_maquina,	// 85 
-	 tam_maquina,   tam_maquina,  -tam_maquina,	// 86 
-	 tam_maquina,   tam_maquina,   tam_maquina,	// 87 
-	 // baixo botao
-	-tam_maquina,  -tam_maquina,   tam_maquina,	// 88
-	 tam_maquina,  -tam_maquina,   tam_maquina,	// 89
-	 tam_maquina,  -tam_maquina,  -tam_maquina,	// 90
-	-tam_maquina,  -tam_maquina,  -tam_maquina,	// 91
 };
 static GLfloat cor[] = {
 	// esquerda
-	GRAY_DARK,
-	GRAY,
-	GRAY,
-	GRAY_DARK,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// direita
-	GRAY,
-	GRAY,
-	GRAY,
-	GRAY,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// cima
 	GRAY_MEDIUM,
 	GRAY_MEDIUM,
 	GRAY_MEDIUM,
 	GRAY_MEDIUM,
 	// baixo
-	GRAY,
-	GRAY,
-	GRAY,
-	GRAY,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// atras
-	GRAY_DARK,
-	GRAY,
-	GRAY,
-	GRAY_DARK,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// frente
-	GRAY_DARK,
-	GRAY_DARK,
-	GRAY,
-	GRAY,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// frente caixa
-	GRAY_DARK,
-	GRAY_DARK,
-	GRAY,
-	GRAY,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// tras caixa
-	GRAY_DARK,
-	GRAY,
-	GRAY,
-	GRAY_DARK,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// baixo caixa
-	GRAY,
-	GRAY,
-	GRAY,
-	GRAY,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// direita caixa
-	GRAY_DARK,
-	GRAY,
-	GRAY,
-	GRAY_DARK,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
+	GRAY_MEDIUM,
 	// caixa
 	ORANGE,
 	ORANGE,
@@ -303,6 +253,46 @@ static GLfloat cor[] = {
 	RED,
 	RED,
 	RED
+};
+static GLfloat texturas_maquina[] = {
+	// esquerda
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// direita
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// cima
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// baixo
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// atras
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// frente
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// frente caixa
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// tras caixa
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// baixo caixa
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// direita caixa
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// caixa
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// moldura
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// ecra
+	0, 0, 1, 0, 1, 1, 0, 1
 };
 
 static GLuint esquerda_maquina[] = { 0,  1,  2,  3 };
@@ -385,6 +375,25 @@ RED,
 RED,
 RED
 };
+static GLfloat texturas_cubos[] = {
+	// esquerda botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// direita botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// atras botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// frente botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// cima botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// baixo botao
+	0, 0, 1, 0, 1, 1, 0, 1
+};
 
 static GLuint esquerda_cubo[] = { 0,  1,  2,  3 };
 static GLuint  direita_cubo[] = { 4,  5,  6,  7 };
@@ -410,15 +419,41 @@ GLfloat		incZoom = 3;
 /* ------------------------------------ 4. INICIALIZAR ------------------------------------ */
 
 
+void init_textures() {
+
+	glGenTextures(1, &textures[0]);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	imag.LoadBmpFile("madeira_preta.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[1]);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	imag.LoadBmpFile("red_rubber.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+};
+
 void init(void)
 {
-	glClearColor(0.9, 0.8, 0.8, 1.0);										// Apagar
-	glEnable(GL_DEPTH_TEST);									// Profundidade
+	glClearColor(0.1, 0.1, 0.1, 1.0);										// Apagar
 	glShadeModel(GL_SMOOTH);									// Interpolacao de cores	
+
+	init_textures();
+	glEnable(GL_DEPTH_TEST);									// Profundidade
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void drawEixos()
@@ -443,17 +478,67 @@ void drawEixos()
 
 /* ------------------------------------- 5. DESENHOS ------------------------------------- */
 
+void drawStick() {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
 
-void drawCube() {
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
+
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawUpperStick() {
+	glEnable(GL_TEXTURE_2D);
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
+
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawButton1() {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
+
+	glDisable(GL_TEXTURE_2D);
+}
+
+void drawButton2() {
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
+
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 void drawMachine() {
+
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_maquina);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_maquina);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_maquina);
@@ -467,11 +552,13 @@ void drawMachine() {
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, caixa);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, moldura);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra);
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 void drawScene()
 {
-	glColorPointer(4, GL_FLOAT, 0, cor);
+	
 
 	// --- figura inteira --- //
 
@@ -481,9 +568,10 @@ void drawScene()
 
 	// --- máquina --- //
 
+	glColorPointer(4, GL_FLOAT, 0, cor);
 	glVertexPointer(3, GL_FLOAT, 0, vertices_maquina);
-	glEnableClientState(GL_VERTEX_ARRAY);
-
+	glTexCoordPointer(2, GL_FLOAT, 0, texturas_maquina);
+	
 	glPushMatrix();
 		drawMachine();
 	glPopMatrix();
@@ -492,7 +580,7 @@ void drawScene()
 
 	glColorPointer(4, GL_FLOAT, 0, cor_cubo);
 	glVertexPointer(3, GL_FLOAT, 0, vertices_cubo);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	glTexCoordPointer(2, GL_FLOAT, 0, texturas_cubos);
 
 	// --- joystick --- //
 
@@ -506,14 +594,14 @@ void drawScene()
 		glPushMatrix();
 			glScalef(1, 3, 1);
 			glTranslatef(0, 1, 0);
-			drawCube();
+			drawStick();
 		glPopMatrix();
 		
 		glPushMatrix();
 			glTranslatef(0, 4, 0);
 			glTranslatef(0, 1, 0);
 			glScalef(2, 1.5, 1.5);
-			drawCube();
+			drawUpperStick();
 		glPopMatrix();
 
 	glPopMatrix();
@@ -525,7 +613,7 @@ void drawScene()
 		glTranslatef(tam_maquina * 2, 0.01, -tam_maquina * 0.5);
 		glScalef(0.03, 0.03, 0.03);
 		glScalef(3, 1.5, 2);
-		drawCube();
+		drawButton1();
 	glPopMatrix();
 
 	glPushMatrix();
@@ -533,7 +621,7 @@ void drawScene()
 		glTranslatef(tam_maquina * 2.25, 0.01, -tam_maquina * 0.75);
 		glScalef(0.03, 0.03, 0.03);
 		glScalef(3, 1.5, 2);
-		drawCube();
+		drawButton2();
 	glPopMatrix();
 };
 
@@ -669,7 +757,6 @@ void Timer(int value)
 void keyboard(unsigned char key, int x, int y) {
 
 	switch (key) {
-
 
 	// --- máquina --- //
 

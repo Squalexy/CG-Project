@@ -18,5 +18,21 @@
     <ClCompile Include="CG_Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PL\PL5\PL5\RgbImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\PL\PL5\PL5\RgbImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\madeira_preta.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="red_rubber.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
