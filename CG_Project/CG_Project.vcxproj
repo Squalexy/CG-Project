@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\madeira_preta.bmp" />
+    <Image Include="pacman.bmp" />
     <Image Include="red_rubber.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

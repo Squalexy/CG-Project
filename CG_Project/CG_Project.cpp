@@ -12,6 +12,7 @@ Nº2019192123
 #include <math.h>
 #include <GL\glut.h>
 #include "RgbImage.h"
+#include <windows.h>
 
 
 /* --------------------------------------- DEFINES --------------------------------------- */
@@ -39,8 +40,9 @@ float		centrox, centrox_botao1, centrox_botao2, centrox_joystick = 0;
 float rotacao, rotacao_botao1, rotacao_joystick_x, rotacao_joystick_z = 0;
 GLfloat										 altura, altura_joystick  = 0;
 
-GLuint   textures[3];
+GLuint   textures[9];
 RgbImage imag;
+GLUquadricObj* esfera = gluNewQuadric();
 
 // --- animações --- //
 
@@ -256,10 +258,10 @@ static GLfloat cor[] = {
 };
 static GLfloat texturas_maquina[] = {
 	// esquerda
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// direita
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// cima
 	0, 0, 1, 0, 1, 1, 0, 1,
@@ -268,28 +270,28 @@ static GLfloat texturas_maquina[] = {
 	0, 0, 1, 0, 1, 1, 0, 1,
 
 	// atras
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// frente
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// frente caixa
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// tras caixa
-	0, 0, 1, 0, 1, 1, 0, 1,
+	1, 0, 1, 1, 0, 1, 0, 0,
 
 	// baixo caixa
 	0, 0, 1, 0, 1, 1, 0, 1,
 
 	// direita caixa
-	0, 0, 1, 0, 1, 1, 0, 1,
+	0, 0, 0, 1, 1, 1, 1, 0,
 
 	// caixa
-	0, 0, 1, 0, 1, 1, 0, 1,
+	0, 0.8, 0, 0.5, 1, 0.5, 1, 0.8,
 
 	// moldura
-	0, 0, 1, 0, 1, 1, 0, 1,
+	0, 0, 0, 1, 1, 1, 1, 0,
 
 	// ecra
 	0, 0, 1, 0, 1, 1, 0, 1
@@ -394,6 +396,44 @@ static GLfloat texturas_cubos[] = {
 	// baixo botao
 	0, 0, 1, 0, 1, 1, 0, 1
 };
+static GLfloat texturas_upper_stick[] = {
+	// esquerda botao
+	0.45, 0.45, 0.5, 0.45, 0.5, 0.5, 0.45, 0.5,
+
+	// direita botao
+	0.45, 0.45, 0.5, 0.45, 0.5, 0.5, 0.45, 0.5,
+
+	// atras botao
+	0.5, 0.5, 0.45, 0.5, 0.45, 0.45, 0.5, 0.45,
+
+	// frente botao
+	0.5, 0.5, 0.45, 0.5, 0.45, 0.45, 0.5, 0.45,
+
+	// cima botao
+	0.45, 0.45, 0.5, 0.45, 0.5, 0.5, 0.45, 0.5,
+
+	// baixo botao
+	0.45, 0.45, 0.5, 0.45, 0.5, 0.5, 0.45, 0.5,
+};
+static GLfloat texturas_botao[] = {
+	// esquerda botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// direita botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// atras botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// frente botao
+	0, 0, 1, 0, 1, 1, 0, 1,
+
+	// cima botao
+	0, 0.25, 0.25, 0, 0.25, 0.25, 0, 0.25,
+
+	// baixo botao
+	0, 0, 1, 0, 1, 1, 0, 1
+};
 
 static GLuint esquerda_cubo[] = { 0,  1,  2,  3 };
 static GLuint  direita_cubo[] = { 4,  5,  6,  7 };
@@ -415,15 +455,47 @@ GLfloat		obsP[] = { rVisao * cos(aVisao), 3.0, rVisao * sin(aVisao) };
 GLfloat		angZoom = 45;
 GLfloat		incZoom = 3;
 
+// --- luzes --- //
+
+GLint   ligaTeto = 1;															// 'T'  
+GLfloat intensidadeT = 0.3;														// 'I'  
+GLint   luzR = 1;		  
+GLint   luzG = 1;			 
+GLint   luzB = 1;			
+GLfloat localPos[4] = { 0.0, 5.0, 0.0, 1.0 };
+GLfloat localCorAmb[4] = { 0, 0, 0, 0.0 };
+GLfloat localCorDif[4] = { luzR, luzG, luzB, 1.0 };
+GLfloat localCorEsp[4] = { luzR, luzG, luzB, 1.0 };
+
+// --- materiais --- //
+
+void initMaterials(int material);
+char Materiais[18][30] = {
+	"Esmerald",  "Jade",  "obsidian",    "Pearl",        "Ruby",
+	"Turquoise", "Brass", "Bronze",      "Chrome",       "Copper",
+	"Gold",      "Silver","blackPlastic","cyankPlastic", "greenPlastic",
+	"redPlastic", "whitePlastic","yellowPlastic" };
+
 
 /* ------------------------------------ 4. INICIALIZAR ------------------------------------ */
 
+
+void initLights(void) {
+	//…………………………………………………………………………………………………………………………………………… Ambiente
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, luzGlobalCorAmb);
+
+	//…………………………………………………………………………………………………………………………………………… Teto
+	glLightfv(GL_LIGHT0, GL_POSITION, localPos);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
+}
 
 void init_textures() {
 
 	glGenTextures(1, &textures[0]);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
-	imag.LoadBmpFile("madeira_preta.bmp");
+	imag.LoadBmpFile("azul_maquina.bmp");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -433,7 +505,77 @@ void init_textures() {
 
 	glGenTextures(1, &textures[1]);
 	glBindTexture(GL_TEXTURE_2D, textures[1]);
+	imag.LoadBmpFile("wallpaper.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[2]);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
+	imag.LoadBmpFile("red_plastic.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[3]);
+	glBindTexture(GL_TEXTURE_2D, textures[3]);
+	imag.LoadBmpFile("screen.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[4]);
+	glBindTexture(GL_TEXTURE_2D, textures[4]);
 	imag.LoadBmpFile("red_rubber.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[5]);
+	glBindTexture(GL_TEXTURE_2D, textures[5]);
+	imag.LoadBmpFile("red_plastic_2.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[6]);
+	glBindTexture(GL_TEXTURE_2D, textures[6]);
+	imag.LoadBmpFile("grey_board.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[7]);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
+	imag.LoadBmpFile("moldura.bmp");
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, imag.GetNumCols(), imag.GetNumRows(), 0, GL_RGB, GL_UNSIGNED_BYTE, imag.ImageData());
+
+	glGenTextures(1, &textures[8]);
+	glBindTexture(GL_TEXTURE_2D, textures[8]);
+	imag.LoadBmpFile("azul_caixa.bmp");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -444,11 +586,15 @@ void init_textures() {
 
 void init(void)
 {
-	glClearColor(0.1, 0.1, 0.1, 1.0);										// Apagar
+	glClearColor(0.05, 0, 0.15, 1.0);										// Apagar
 	glShadeModel(GL_SMOOTH);									// Interpolacao de cores	
 
 	init_textures();
 	glEnable(GL_DEPTH_TEST);									// Profundidade
+
+	// LUZ
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -478,67 +624,62 @@ void drawEixos()
 
 /* ------------------------------------- 5. DESENHOS ------------------------------------- */
 
+
 void drawStick() {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textures[1]);
-
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
 void drawUpperStick() {
 	glEnable(GL_TEXTURE_2D);
-
+	glBindTexture(GL_TEXTURE_2D, textures[4]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
 void drawButton1() {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
+	glBindTexture(GL_TEXTURE_2D, textures[5]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
 void drawButton2() {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textures[1]);
-
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, atras_cubo);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_cubo);
+	glBindTexture(GL_TEXTURE_2D, textures[5]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_cubo);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_cubo);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
 void drawMachine() {
-
 	glEnable(GL_TEXTURE_2D);
-
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
-	
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, esquerda_maquina);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_maquina);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, cima_maquina);
@@ -548,17 +689,19 @@ void drawMachine() {
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, frente_caixa);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, tras_caixa);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_caixa);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_caixa);
+	glBindTexture(GL_TEXTURE_2D, textures[8]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, caixa);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, moldura);
+	glBindTexture(GL_TEXTURE_2D, textures[3]);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra);
-
 	glDisable(GL_TEXTURE_2D);
 }
 
 void drawScene()
 {
-	
 
 	// --- figura inteira --- //
 
@@ -579,8 +722,7 @@ void drawScene()
 	// --- joystick e botões --- //
 
 	glColorPointer(4, GL_FLOAT, 0, cor_cubo);
-	glVertexPointer(3, GL_FLOAT, 0, vertices_cubo);
-	glTexCoordPointer(2, GL_FLOAT, 0, texturas_cubos);
+	
 
 	// --- joystick --- //
 
@@ -591,11 +733,17 @@ void drawScene()
 		glRotatef(rotacao_joystick_x, 0.0, 0.0, 1.0);
 		glRotatef(rotacao_joystick_z, 1.0, 0.0, 0.0);
 
+		glVertexPointer(3, GL_FLOAT, 0, vertices_cubo);
+		glTexCoordPointer(2, GL_FLOAT, 0, texturas_cubos);
+
 		glPushMatrix();
 			glScalef(1, 3, 1);
 			glTranslatef(0, 1, 0);
 			drawStick();
 		glPopMatrix();
+
+		glVertexPointer(3, GL_FLOAT, 0, vertices_cubo);
+		glTexCoordPointer(2, GL_FLOAT, 0, texturas_upper_stick);
 		
 		glPushMatrix();
 			glTranslatef(0, 4, 0);
@@ -607,6 +755,9 @@ void drawScene()
 	glPopMatrix();
 
 	// --- botões ---
+
+	glVertexPointer(3, GL_FLOAT, 0, vertices_cubo);
+	glTexCoordPointer(2, GL_FLOAT, 0, texturas_botao);
 
 	glPushMatrix();
 		glTranslatef(centrox_botao1, altura_botao1, 0.0);
@@ -625,6 +776,17 @@ void drawScene()
 	glPopMatrix();
 };
 
+
+void iluminacao() {
+	glLightfv(GL_LIGHT0, GL_POSITION, localPos);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, localCorAmb);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, localCorDif);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, localCorEsp);
+	if (ligaTeto)
+		glEnable(GL_LIGHT0);
+	else
+		glDisable(GL_LIGHT0);
+}
 
 /* ------------------------------------- 6. DISPLAY -------------------------------------- */
 
@@ -662,6 +824,7 @@ void display(void) {
 		gluLookAt(3.4, 1, 0, -1, 0, 0, 0, 1, 0);
 
 		// Objetos
+		
 		drawScene();
 
 	// --- Atualização --- //
