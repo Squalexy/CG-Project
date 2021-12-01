@@ -1150,8 +1150,6 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 
-	// --- material --- //
-
 	//--- escape --- //
 
 	case 27:
@@ -1195,7 +1193,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(wScreen, hScreen);
 	glutInitWindowPosition(300, 100);
-	glutCreateWindow("|Posicionar maquina -'qweasd'|        |Joystick - 'ijkl'|        |Botoes - 'nm'|        |Observador - 'SETAS'|        |Zoom - x/y|");
+	glutCreateWindow("|Posicionar m�quina -'qweasd'|        |Joystick - 'ijkl'|        |Bot�es - 'nm'|        |Observador - 'SETAS'|        |Zoom - x/y|");
 
 	init();
 
