@@ -21,6 +21,9 @@
     <ClCompile Include="..\..\..\PL\PL5\PL5\RgbImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PL\PL6_1\PL6_1\materiais.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\PL\PL5\PL5\RgbImage.h">
