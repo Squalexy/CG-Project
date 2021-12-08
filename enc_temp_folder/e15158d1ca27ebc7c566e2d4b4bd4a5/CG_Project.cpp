@@ -734,10 +734,9 @@ void init(void)
 	initLights();
 				 
 				 
-	// TRANSPARENCIA
-	glEnable(GL_BLEND);
+	// MATERIAIS
+	//initMaterials(12);
 
-	// CLIENT STATES
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
