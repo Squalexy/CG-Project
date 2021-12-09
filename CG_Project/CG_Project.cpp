@@ -139,6 +139,16 @@ static GLfloat  vertices_maquina[] = {
 	tam_maquina, tam_maquina * 0.8, tam_maquina, // 45
 	tam_maquina, tam_maquina * 0.8,-tam_maquina, // 46
 	tam_maquina,    0,			  -tam_maquina, // 47
+	// frente transparente ecra
+	tam_maquina * 1.3,	 0,			   tam_maquina, //
+	tam_maquina * 1.3, tam_maquina * 0.8, tam_maquina, // 
+	tam_maquina * 1.3, tam_maquina * 0.8,-tam_maquina, // 
+	tam_maquina * 1.3,    0,			  -tam_maquina, // 
+	// cima transparente ecra
+	tam_maquina,   tam_maquina * 0.8,  tam_maquina,	//
+	tam_maquina,   tam_maquina * 0.8, -tam_maquina,	// 
+	tam_maquina * 1.3,   tam_maquina * 0.8, -tam_maquina,	// 
+	tam_maquina * 1.3,   tam_maquina * 0.8,  tam_maquina,	// 
 };
 static GLfloat   normais_maquina[] = {
 	// esquerda
@@ -201,6 +211,16 @@ static GLfloat   normais_maquina[] = {
 1.0,  0.0,  0.0,
 1.0,  0.0,  0.0,
 1.0,  0.0,  0.0,
+// ecra frente transparente
+1.0,  0.0,  0.0,
+1.0,  0.0,  0.0,
+1.0,  0.0,  0.0,
+1.0,  0.0,  0.0,
+// ecra cima transparente
+0.0,  1.0,  0.0,
+0.0,  1.0,  0.0,
+0.0,  1.0,  0.0,
+0.0,  1.0,  0.0,
 };
 static GLuint	esquerda_maquina[] = { 0,  1,  2,  3 };
 static GLuint		cima_maquina[] = { 4,  5,  6,  7 };
@@ -214,6 +234,8 @@ static GLuint	   direita_caixa[] = { 32, 33, 34, 35 };
 static GLuint              caixa[] = { 36, 37, 38, 39 };
 static GLuint			 moldura[] = { 40, 41, 42, 43 };
 static GLuint			    ecra[] = { 44, 45, 46, 47 };
+static GLuint ecra_frente_transp[] = { 48, 49, 50, 51 };
+static GLuint	ecra_cima_transp[] = { 52, 53, 54, 55 };
 
 // cubos
 static GLfloat vertices_cubo[] = {
@@ -594,6 +616,12 @@ float blue_mach[] = { 0.0, 0.2, 0.6, 1 };
 int shininess = 2;
 
 
+/* --------------------------------------- MALHA POL -------------------------------------- */
+
+
+GLint dim = 64;
+
+
 /* ------------------------------------ 1. INICIALIZAR ------------------------------------ */
 
 
@@ -832,6 +860,7 @@ void drawMachine() {
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, tras_caixa);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, baixo_caixa);
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, direita_caixa);
+	
 
 	initMaterials(16);
 	glEnable(GL_TEXTURE_2D);
@@ -842,8 +871,39 @@ void drawMachine() {
 	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, moldura);
 	glDisable(GL_TEXTURE_2D);
 
-	initMaterials(11);
-	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra);
+	
+	// glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra);
+
+	// malha poligonos -> ecra
+	glPushMatrix();
+		initMaterials(11);
+		glNormal3f(0, 0, 1);         
+		glScalef(1, 0.411, 1);
+		glRotatef(90, 0, 1, 0);
+		glTranslatef(-tam_maquina, -tam_maquina * 0.5 * 0.1, tam_maquina);
+		float med_dim = (float)dim / 2;
+		glBegin(GL_QUADS);
+		for (int i = 0; i < dim; i++)
+			for (int j = 0; j < dim; j++) {
+				glTexCoord2f((float)j / dim, (float)i/ dim);
+				glVertex3d((float)j / med_dim, (float)i / med_dim, 0);
+				glTexCoord2f((float)(j + 1) / dim, (float)i / dim);
+				glVertex3d((float)(j + 1) / med_dim, (float)i / med_dim, 0);
+				glTexCoord2f((float)(j + 1) / dim, (float)(i + 1) / dim);
+				glVertex3d((float)(j + 1) / med_dim, (float)(i + 1) / med_dim, 0);
+				glTexCoord2f((float)j / dim, (float)(i + 1) / dim);
+				glVertex3d((float)j / med_dim, (float)(i + 1) / med_dim, 0);
+			}
+		glEnd();
+	glPopMatrix();
+
+	float cor_vidro[] = { 0.5, 0.5, 0.5, 1 };
+	float cor_vidro_transparente[] = { 0.5, 0.5, 0.5, 0 };
+	glMaterialfv(GL_FRONT, GL_AMBIENT, cor_vidro);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, cor_vidro_transparente);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, cor_vidro);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra_frente_transp);
+	glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_INT, ecra_cima_transp);
 }
 
 void drawScene()
@@ -1219,7 +1279,18 @@ void keyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 
-		// --- material --- //
+		// --- malha poligonos --- //
+	case 'p': case 'P':
+		dim = 2 * dim;
+		if (dim > 256) dim = 256;
+		glutPostRedisplay();
+		break;
+
+	case 'o': case 'O':
+		dim = 0.75 * dim;
+		if (dim < 1) dim = 1;
+		glutPostRedisplay();
+		break;
 
 		//--- escape --- //
 
