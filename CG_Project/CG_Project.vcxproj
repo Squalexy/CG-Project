@@ -140,11 +140,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\PL\PL5\PL5\RgbImage.cpp" />
-    <ClCompile Include="..\..\..\PL\PL6_1\PL6_1\materiais.cpp" />
     <ClCompile Include="CG_Project.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\PL\PL5\PL5\RgbImage.h" />
+    <ClInclude Include="materiais.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\madeira_preta.bmp" />
